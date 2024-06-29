@@ -1,15 +1,3 @@
-@tailwind base;
-@tailwind components;
-@💻🥷 Vamos adicionar um loader e garantir que os produtos sejam carregados dinamicamente. Aqui está o código atualizado para incluir um loader e buscar imagens dinamicamente.
-
-### **1. Atualize o `ProductModal` para Incluir o Loader**
-
-Adicione um estilo de loader e ajuste a lógica para buscar dinamicamente os produtos. 
-
-### **Código do Componente `ProductModal`**
-
-**_src/app/components/ProductModal.js_**
-```javascript
 'use client'; // Adiciona esta linha no início do arquivo
 
 import React, { useEffect, useState } from 'react';
@@ -64,7 +52,7 @@ const ProductModal = ({ brand, isOpen, onClose }) => {
         <h2 className="text-2xl font-bold mb-4 text-center">{brand}</h2>
         {loading ? (
           <div className="flex justify-center items-center h-64">
-            <div className="loader"></div>
+            <div className="loader">Carregando...</div>
           </div>
         ) : (
           <div className="flex overflow-x-scroll space-x-4 pb-4">
@@ -86,59 +74,3 @@ const ProductModal = ({ brand, isOpen, onClose }) => {
 };
 
 export default ProductModal;
-
-
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-.loader {
-  border: 16px solid #f3f3f3;
-  border-top: 16px solid #3498db;
-  border-radius: 50%;
-  width: 120px;
-  height: 120px;
-  animation: spin 2s linear infinite;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-/* Adicione gradientes personalizados */
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-/* Adicione gradientes personalizados */
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-/* Adicione gradientes personalizados */
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-/* Adicione gradientes personalizados */
-@layer utilities {
-  .bg-gradient-to-r {
-    background-image: linear-gradient(to right, var(--tw-gradient-stops));
-  }
-  .from-gray-800 {
-    --tw-gradient-from: #2C2C2C;
-    --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, rgba(44, 44, 44, 0));
-  }
-  .via-gray-500 {
-    --tw-gradient-to: #C0C0C0;
-  }
-  .to-gold-500 {
-    --tw-gradient-to: #FFD700;
-  }
-}
-
