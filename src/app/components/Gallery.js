@@ -1,18 +1,19 @@
 import React from 'react';
 
-const brands = [
-  'Prada', 'Dior', 'Gucci', 'LV', 'Loewe', 'Saint Laurent', 
-  'Maison Alaia', 'Valentino', 'Cult Gaia', 'Celine', 
-  'Balenciaga', 'Jacquemus', 'MIU MIU'
+const images = [
+  { src: '/images/79.jpg', alt: 'Gallery Image 1' },
+  { src: '/images/90.jpg', alt: 'Gallery Image 2' },
+  { src: '/images/95.jpg', alt: 'Gallery Image 3' },
+  { src: '/images/96.jpg', alt: 'Gallery Image 4' },
+  { src: '/images/108.jpg', alt: 'Gallery Image 5' },
 ];
 
 const Gallery = () => {
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
-      {brands.map((brand, index) => (
-        <div key={index} className="brand">
-          <img src={`/images/${brand.toLowerCase()}.jpg`} alt={brand} className="w-full h-auto" />
-          <p className="text-center mt-2">{brand}</p>
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-4">
+      {images.map((image, index) => (
+        <div key={index} className="brand bg-white p-4 shadow rounded-lg">
+          <img src={image.src} alt={image.alt} className="w-full h-auto rounded" />
         </div>
       ))}
     </div>
