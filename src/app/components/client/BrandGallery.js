@@ -37,7 +37,11 @@ const BrandGallery = () => {
     <div>
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6 p-4">
         {brands.map((brand, index) => (
-          <div key={index} className="brand bg-white p-4 shadow rounded-lg cursor-pointer" onClick={() => handleBrandClick(brand.name)}>
+          <div
+            key={index}
+            className="brand bg-white p-4 shadow rounded-lg cursor-pointer transform transition duration-300 hover:scale-105 hover:shadow-lg"
+            onClick={() => handleBrandClick(brand.name)}
+          >
             <img src={brand.image} alt={brand.name} className="w-full h-auto rounded" />
             <p className="text-center mt-2 text-lg font-semibold">{brand.name}</p>
           </div>
