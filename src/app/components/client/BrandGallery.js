@@ -10,7 +10,7 @@ const brands = [
   { name: '', image: '/images/lv.png' },
   { name: '', image: '/images/loewe.png' },
   { name: '', image: '/images/saint-laurent.png' },
-  { name: '', image: '/images/maison-Alaia.jpg' },
+  { name: '', image: '/images/maison-Alaia.png' },
   { name: '', image: '/images/valentino.png' },
   { name: '', image: '/images/cult-gaia.png' },
   { name: '', image: '/images/celine.png' },
