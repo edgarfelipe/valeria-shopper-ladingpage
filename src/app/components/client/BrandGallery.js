@@ -11,11 +11,11 @@ const brands = [
   { name: '', image: '/images/loewe.png' },
   { name: '', image: '/images/saint-laurent.png' },
   { name: '', image: '/images/maison-Alaia.png' },
-  { name: '', image: '/images/valentino.png' },
+  { name: '', image: '/images/valentino.jpeg' },
   { name: '', image: '/images/cult-gaia.png' },
-  { name: '', image: '/images/celine.png' },
+  { name: '', image: '/images/celine.jpg' },
   { name: '', image: '/images/balenciaga.png' },
-  { name: '', image: '/images/jacquemus.png' },
+  { name: '', image: '/images/jacquemus.jpg' },
   { name: '', image: '/images/miu-miu.png' },
 ];
 
