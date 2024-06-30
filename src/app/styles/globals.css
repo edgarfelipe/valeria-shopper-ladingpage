@@ -4,14 +4,9 @@
 
 /* Adicione classes personalizadas */
 @layer components {
-  .hidden-mobile {
+  .hidden-md {
     @screen md {
       display: none;
-    }
-  }
-  .visible-mobile {
-    @screen md {
-      display: block;
     }
   }
 }
