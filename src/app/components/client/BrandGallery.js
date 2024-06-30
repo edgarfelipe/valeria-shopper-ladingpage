@@ -4,19 +4,19 @@ import React, { useState } from 'react';
 import ProductModal from '../ProductModal';
 
 const brands = [
-  { name: '', image: '/images/prada.png' },
-  { name: '', image: '/images/dior.png' },
-  { name: '', image: '/images/gucci.png' },
-  { name: '', image: '/images/lv.png' },
-  { name: '', image: '/images/loewe.png' },
-  { name: '', image: '/images/saint-laurent.png' },
-  { name: '', image: '/images/maison-Alaia.png' },
-  { name: '', image: '/images/valentino.jpeg' },
-  { name: '', image: '/images/cult-gaia.png' },
-  { name: '', image: '/images/celine.jpg' },
-  { name: '', image: '/images/balenciaga.png' },
-  { name: '', image: '/images/jacquemus.jpg' },
-  { name: '', image: '/images/miu-miu.png' },
+  { name: 'Prada', image: '/images/prada.png' },
+  { name: 'Dior', image: '/images/dior.png' },
+  { name: 'Gucci', image: '/images/gucci.png' },
+  { name: 'LV', image: '/images/lv.png' },
+  { name: 'Loewe', image: '/images/loewe.png' },
+  { name: 'Saint Laurent', image: '/images/saint-laurent.png' },
+  { name: 'Maison Alaia', image: '/images/maison-Alaia.png' },
+  { name: 'Valentino', image: '/images/valentino.jpeg' },
+  { name: 'Cult Gaia', image: '/images/cult-gaia.png' },
+  { name: 'Celine', image: '/images/celine.jpg' },
+  { name: 'Balenciaga', image: '/images/balenciaga.png' },
+  { name: 'Jacquemus', image: '/images/jacquemus.png' },
+  { name: 'MIU MIU', image: '/images/miu-miu.png' },
 ];
 
 const BrandGallery = () => {
@@ -43,7 +43,6 @@ const BrandGallery = () => {
             onClick={() => handleBrandClick(brand.name)}
           >
             <img src={brand.image} alt={brand.name} className="w-auto h-24" />
-            <p className="text-center mt-2 text-lg font-semibold">{brand.name}</p>
           </div>
         ))}
       </div>

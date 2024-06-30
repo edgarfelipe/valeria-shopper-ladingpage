@@ -1,13 +1,13 @@
-'use client'; // Adiciona esta linha no início do arquivo
+'use client';
 
 import React, { useEffect, useState } from 'react';
-import { AiOutlineClose } from 'react-icons/ai'; // Adiciona um ícone de fechamento
+import { AiOutlineClose } from 'react-icons/ai';
+import { FaWhatsapp } from 'react-icons/fa';
 
 const fetchProducts = async (brand) => {
-  // Simula a busca de produtos dinamicamente
   const products = {
     Prada: [
-      { name: 'Product 1', image: '/images/products/prada/product1.jpg' },
+      { name: 'Product 1', image: '/images/products/prada/prada.png' },
       { name: 'Product 2', image: '/images/products/prada/product2.jpg' },
       { name: 'Product 3', image: '/images/products/prada/product3.jpg' },
     ],
@@ -19,7 +19,6 @@ const fetchProducts = async (brand) => {
     // Adicione mais marcas e produtos aqui
   };
 
-  // Simulação de tempo de carregamento
   await new Promise((resolve) => setTimeout(resolve, 1000));
 
   return products[brand] || [];
@@ -55,14 +54,19 @@ const ProductModal = ({ brand, isOpen, onClose }) => {
             <div className="loader">Carregando...</div>
           </div>
         ) : (
-          <div className="flex overflow-x-scroll space-x-4 pb-4">
+          <div className="flex overflow-x-auto space-x-4 pb-4">
             {products.length === 0 ? (
               <p className="text-center w-full">Nenhum produto encontrado</p>
             ) : (
               products.map((product, index) => (
-                <div key={index} className="flex-none w-60 cursor-pointer" onClick={() => handleProductClick(product)}>
+                <div key={index} className="flex-none w-60 relative">
                   <img src={product.image} alt={product.name} className="w-full h-auto rounded-lg shadow-md" />
-                  <p className="text-center mt-2">{product.name}</p>
+                  <button
+                    className="absolute bottom-4 right-4 bg-green-500 text-white p-2 rounded-full shadow-lg transform transition duration-300 hover:scale-105"
+                    onClick={() => handleProductClick(product)}
+                  >
+                    <FaWhatsapp className="text-2xl" />
+                  </button>
                 </div>
               ))
             )}
