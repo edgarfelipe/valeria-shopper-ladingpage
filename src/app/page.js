@@ -32,7 +32,7 @@ const Home = () => {
           </div>
         </section>
         <section className="gallery mt-8">
-          <h2 className="text-center text-3xl font-bold mb-4">Galeria de Marcas</h2>
+          <h2 className="text-center text-3xl font-bold mb-4">Marcas</h2>
           <BrandGallery />
         </section>
         <PersonalShopper />
