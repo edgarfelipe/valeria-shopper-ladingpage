@@ -29,12 +29,23 @@ const AdminPanel = () => {
   const [personalShopper, setPersonalShopper] = useState<PersonalShopper | null>(null);
   const [siteSettings, setSiteSettings] = useState<SiteSettings | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const tabs = [
+    { id: 'brands', name: 'Marcas', icon: Tags },
+    { id: 'categories', name: 'Categorias', icon: LayoutGrid },
+    { id: 'products', name: 'Produtos', icon: BookOpen },
+    { id: 'slides', name: 'Slides', icon: Presentation },
+    { id: 'personal_shopper', name: 'Personal Shopper', icon: UserCircle },
+    { id: 'settings', name: 'Configurações', icon: Settings },
+  ];
 
   useEffect(() => {
     fetchData();
   }, [activeTab]);
 
   const fetchData = async () => {
+    setIsLoading(true);
     try {
       switch (activeTab) {
         case 'brands':
@@ -93,13 +104,15 @@ const AdminPanel = () => {
             .select('*')
             .single();
           
-          if (settingsError) throw settingsError;
+          if (settingsError && settingsError.code !== 'PGRST116') throw settingsError;
           setSiteSettings(settingsData);
           break;
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error fetching data:', error);
       toast.error('Erro ao carregar dados');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -274,19 +287,26 @@ const AdminPanel = () => {
             onCancel={() => setShowForm(false)}
           />
         );
+      case 'personal_shopper':
+        return (
+          <PersonalShopperForm
+            personalShopper={personalShopper}
+            onSuccess={handleFormSuccess}
+            onCancel={() => setShowForm(false)}
+          />
+        );
       default:
         return null;
     }
   };
 
-  const tabs = [
-    { id: 'brands', name: 'Marcas', icon: Tags },
-    { id: 'categories', name: 'Categorias', icon: LayoutGrid },
-    { id: 'products', name: 'Produtos', icon: BookOpen },
-    { id: 'slides', name: 'Slides', icon: Presentation },
-    { id: 'personal_shopper', name: 'Personal Shopper', icon: UserCircle },
-    { id: 'settings', name: 'Configurações', icon: Settings },
-  ];
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-orange-500"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -328,7 +348,7 @@ const AdminPanel = () => {
                 'Produtos'
               }
             </h2>
-            {activeTab !== 'personal_shopper' && activeTab !== 'settings' && (
+            {activeTab !== 'settings' && (
               <button
                 onClick={() => {
                   setEditingProduct(null);
@@ -344,6 +364,7 @@ const AdminPanel = () => {
                   activeTab === 'brands' ? 'Marca' : 
                   activeTab === 'categories' ? 'Categoria' : 
                   activeTab === 'slides' ? 'Slide' : 
+                  activeTab === 'personal_shopper' ? 'Personal Shopper' :
                   'Produto'
                 }
               </button>
@@ -377,7 +398,14 @@ const AdminPanel = () => {
                     />
                   ) : (
                     <div className="text-center py-8">
-                      <p className="text-gray-500">Nenhuma informação de Personal Shopper encontrada.</p>
+                      <p className="text-gray-500 mb-4">Nenhuma informação de Personal Shopper encontrada.</p>
+                      <button
+                        onClick={() => setShowForm(true)}
+                        className="inline-flex items-center bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600 transition-all duration-200"
+                      >
+                        <Plus className="w-4 h-4 mr-2" />
+                        Adicionar Personal Shopper
+                      </button>
                     </div>
                   )}
                 </div>

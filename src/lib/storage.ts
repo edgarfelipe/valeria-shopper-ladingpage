@@ -89,14 +89,21 @@ export async function uploadImage(
     const filePath = `${type}s/${filename}`;
 
     // Upload new file
-    const { error: uploadError } = await supabase.storage
+    const { error: uploadError, data } = await supabase.storage
       .from('fotos_valeria')
       .upload(filePath, optimizedBlob, {
         contentType: 'image/webp',
-        upsert: false
+        upsert: true
       });
 
-    if (uploadError) throw uploadError;
+    if (uploadError) {
+      console.error('Upload error:', uploadError);
+      throw uploadError;
+    }
+
+    if (!data) {
+      throw new Error('Falha ao fazer upload da imagem');
+    }
 
     // Get public URL
     const { data: { publicUrl } } = supabase.storage
@@ -121,9 +128,10 @@ export async function deleteImage(path: string): Promise<void> {
 
     if (error) {
       console.error('Error deleting image:', error);
-      return;
+      throw error;
     }
   } catch (error) {
     console.error('Error in delete operation:', error);
+    throw error;
   }
 }

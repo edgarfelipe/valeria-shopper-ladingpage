@@ -5,7 +5,7 @@ import toast from 'react-hot-toast';
 import ImageUpload from '../ImageUpload';
 
 interface PersonalShopperFormProps {
-  personalShopper: PersonalShopper;
+  personalShopper?: PersonalShopper;
   onSuccess: () => void;
   onCancel: () => void;
 }
@@ -15,11 +15,11 @@ const PersonalShopperForm: React.FC<PersonalShopperFormProps> = ({
   onSuccess,
   onCancel
 }) => {
-  const [title, setTitle] = useState(personalShopper.title);
-  const [description1, setDescription1] = useState(personalShopper.description1);
-  const [description2, setDescription2] = useState(personalShopper.description2);
-  const [description3, setDescription3] = useState(personalShopper.description3);
-  const [imageUrl, setImageUrl] = useState(personalShopper.image_url);
+  const [title, setTitle] = useState(personalShopper?.title || '');
+  const [description1, setDescription1] = useState(personalShopper?.description1 || '');
+  const [description2, setDescription2] = useState(personalShopper?.description2 || '');
+  const [description3, setDescription3] = useState(personalShopper?.description3 || '');
+  const [imageUrl, setImageUrl] = useState(personalShopper?.image_url || '');
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -32,24 +32,36 @@ const PersonalShopperForm: React.FC<PersonalShopperFormProps> = ({
 
     setLoading(true);
     try {
-      const { error } = await supabase
-        .from('personal_shopper')
-        .update({
-          title: title.trim(),
-          description1: description1.trim(),
-          description2: description2.trim(),
-          description3: description3.trim(),
-          image_url: imageUrl
-        })
-        .eq('id', personalShopper.id);
+      const data = {
+        title: title.trim(),
+        description1: description1.trim(),
+        description2: description2.trim(),
+        description3: description3.trim(),
+        image_url: imageUrl
+      };
+
+      let error;
+
+      if (personalShopper) {
+        // Update existing
+        ({ error } = await supabase
+          .from('personal_shopper')
+          .update(data)
+          .eq('id', personalShopper.id));
+      } else {
+        // Insert new
+        ({ error } = await supabase
+          .from('personal_shopper')
+          .insert([data]));
+      }
 
       if (error) throw error;
 
-      toast.success('Informações atualizadas com sucesso!');
+      toast.success(personalShopper ? 'Informações atualizadas com sucesso!' : 'Personal Shopper adicionado com sucesso!');
       onSuccess();
     } catch (error) {
-      console.error('Error updating personal shopper:', error);
-      toast.error('Erro ao atualizar informações');
+      console.error('Error saving personal shopper:', error);
+      toast.error('Erro ao salvar informações');
     } finally {
       setLoading(false);
     }
@@ -76,6 +88,7 @@ const PersonalShopperForm: React.FC<PersonalShopperFormProps> = ({
           rows={3}
           className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500"
           required
+          placeholder="Como Personal Shopper, meu objetivo é transformar sua experiência de compra..."
         />
       </div>
 
@@ -87,6 +100,7 @@ const PersonalShopperForm: React.FC<PersonalShopperFormProps> = ({
           rows={3}
           className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500"
           required
+          placeholder="Desde a seleção de peças exclusivas até a criação de looks completos..."
         />
       </div>
 
@@ -98,6 +112,7 @@ const PersonalShopperForm: React.FC<PersonalShopperFormProps> = ({
           rows={3}
           className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500"
           required
+          placeholder="Entre em contato e permita-me tornar suas compras uma experiência..."
         />
       </div>
 

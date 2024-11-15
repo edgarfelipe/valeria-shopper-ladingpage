@@ -2,14 +2,21 @@ import { SupabaseClient } from '@supabase/supabase-js';
 
 export const initializeSettings = async (supabase: SupabaseClient) => {
   try {
+    // Check if settings exist
     const { data: existingSettings, error: checkError } = await supabase
       .from('site_settings')
       .select('id')
       .single();
 
-    if (checkError && checkError.code !== 'PGRST116') throw checkError;
+    if (checkError && checkError.code !== 'PGRST116') {
+      console.error('Error checking settings:', checkError);
+      throw checkError;
+    }
 
+    // Only create settings if they don't exist
     if (!existingSettings) {
+      console.log('Creating default settings...');
+      
       const { error: insertError } = await supabase
         .from('site_settings')
         .insert([{
@@ -24,11 +31,15 @@ export const initializeSettings = async (supabase: SupabaseClient) => {
           featured_products_title: 'Produtos em Destaque'
         }]);
 
-      if (insertError) throw insertError;
+      if (insertError) {
+        console.error('Error inserting default settings:', insertError);
+        throw insertError;
+      }
     }
 
     return null;
   } catch (error) {
+    console.error('Error in initializeSettings:', error);
     return error;
   }
 };

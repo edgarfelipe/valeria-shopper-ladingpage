@@ -1,107 +1,51 @@
 import { supabase } from './supabase';
+import { createTables } from './database/tables';
+import { setupStorage } from './database/storage';
+import { initializeSettings } from './database/settings';
+import toast from 'react-hot-toast';
 
 export async function setupDatabase() {
   try {
-    // Create tables
-    const { error: createError } = await supabase.rpc('setup_tables', {
-      sql: `
-        -- Create hero_slides table
-        CREATE TABLE IF NOT EXISTS hero_slides (
-          id BIGSERIAL PRIMARY KEY,
-          image_url TEXT NOT NULL,
-          title TEXT NOT NULL,
-          description TEXT,
-          created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL
-        );
+    // Test connection first
+    const { error: testError } = await supabase
+      .from('site_settings')
+      .select('id')
+      .limit(1);
 
-        -- Create brands table
-        CREATE TABLE IF NOT EXISTS brands (
-          id BIGSERIAL PRIMARY KEY,
-          name TEXT NOT NULL,
-          logo_url TEXT,
-          created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL
-        );
+    // If table doesn't exist, create all tables
+    if (testError?.code === 'PGRST116') {
+      console.log('Creating database schema...');
+      
+      // Create tables
+      const tablesError = await createTables();
+      if (tablesError) {
+        console.error('Error creating tables:', tablesError);
+        throw tablesError;
+      }
 
-        -- Create categories table
-        CREATE TABLE IF NOT EXISTS categories (
-          id BIGSERIAL PRIMARY KEY,
-          name TEXT NOT NULL,
-          image_url TEXT,
-          created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL
-        );
-
-        -- Create products table
-        CREATE TABLE IF NOT EXISTS products (
-          id BIGSERIAL PRIMARY KEY,
-          name TEXT NOT NULL,
-          description TEXT,
-          images TEXT[] DEFAULT '{}',
-          brand_id BIGINT REFERENCES brands(id) ON DELETE CASCADE,
-          category_id BIGINT REFERENCES categories(id) ON DELETE CASCADE,
-          is_featured BOOLEAN DEFAULT false,
-          created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL
-        );
-
-        -- Create personal_shopper table
-        CREATE TABLE IF NOT EXISTS personal_shopper (
-          id BIGSERIAL PRIMARY KEY,
-          image_url TEXT NOT NULL,
-          title TEXT NOT NULL,
-          description1 TEXT NOT NULL,
-          description2 TEXT NOT NULL,
-          description3 TEXT NOT NULL,
-          created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL
-        );
-
-        -- Create site_settings table
-        CREATE TABLE IF NOT EXISTS site_settings (
-          id BIGSERIAL PRIMARY KEY,
-          show_hero_slides BOOLEAN DEFAULT true,
-          show_featured_products BOOLEAN DEFAULT true,
-          show_brands BOOLEAN DEFAULT true,
-          show_categories BOOLEAN DEFAULT true,
-          show_all_products BOOLEAN DEFAULT true,
-          show_personal_shopper BOOLEAN DEFAULT true,
-          brands_title TEXT DEFAULT 'Marcas que Trabalhamos',
-          categories_title TEXT DEFAULT 'Categorias',
-          featured_products_title TEXT DEFAULT 'Produtos em Destaque',
-          created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL,
-          updated_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL
-        );
-      `
-    });
-
-    if (createError) {
-      throw createError;
+      // Initialize settings
+      const settingsError = await initializeSettings(supabase);
+      if (settingsError) {
+        console.error('Error initializing settings:', settingsError);
+        throw settingsError;
+      }
+    } else if (testError) {
+      console.error('Database connection error:', testError);
+      throw new Error('Failed to connect to database');
     }
 
-    // Insert default site settings if not exists
-    const { error: insertSettingsError } = await supabase
-      .from('site_settings')
-      .upsert([{
-        id: 1,
-        show_hero_slides: true,
-        show_featured_products: true,
-        show_brands: true,
-        show_categories: true,
-        show_all_products: true,
-        show_personal_shopper: true,
-        brands_title: 'Marcas que Trabalhamos',
-        categories_title: 'Categorias',
-        featured_products_title: 'Produtos em Destaque'
-      }], {
-        onConflict: 'id'
-      });
-
-    if (insertSettingsError) {
-      throw insertSettingsError;
+    // Setup storage (always run to ensure bucket exists)
+    const storageError = await setupStorage(supabase);
+    if (storageError) {
+      // Log but continue if storage setup fails
+      console.error('Storage setup error:', storageError);
     }
 
     console.log('Database setup completed successfully');
-  } catch (error) {
-    console.error('Error setting up database:', error);
+    return null;
+  } catch (error: any) {
+    console.error('Database setup error:', error);
+    toast.error('Erro ao configurar o banco de dados. Por favor, tente novamente.');
+    return error;
   }
 }
-
-// Run setup
-setupDatabase();
