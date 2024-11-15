@@ -93,7 +93,7 @@ export async function uploadImage(
       .from('fotos_valeria')
       .upload(filePath, optimizedBlob, {
         contentType: 'image/webp',
-        upsert: true // Changed to true to allow overwriting
+        upsert: false
       });
 
     if (uploadError) throw uploadError;

@@ -12,23 +12,12 @@ const BrandForm: React.FC<BrandFormProps> = ({ onSuccess, onCancel }) => {
   const [name, setName] = useState('');
   const [logoUrl, setLogoUrl] = useState('');
   const [loading, setLoading] = useState(false);
-  const [isUploading, setIsUploading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!name.trim()) {
-      toast.error('Por favor, insira o nome da marca');
-      return;
-    }
-
-    if (!logoUrl) {
-      toast.error('Por favor, faça upload do logo da marca');
-      return;
-    }
-
-    if (isUploading) {
-      toast.error('Aguarde o upload da imagem terminar');
+    if (!name || !logoUrl) {
+      toast.error('Por favor, preencha todos os campos');
       return;
     }
 
@@ -55,15 +44,6 @@ const BrandForm: React.FC<BrandFormProps> = ({ onSuccess, onCancel }) => {
     }
   };
 
-  const handleImageUpload = (url: string) => {
-    setLogoUrl(url);
-    setIsUploading(false);
-  };
-
-  const handleImageUploadStart = () => {
-    setIsUploading(true);
-  };
-
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div>
@@ -81,8 +61,7 @@ const BrandForm: React.FC<BrandFormProps> = ({ onSuccess, onCancel }) => {
         <label className="block text-sm font-medium text-gray-700 mb-2">Logo da Marca</label>
         <ImageUpload
           type="brand"
-          onUpload={handleImageUpload}
-          onUploadStart={handleImageUploadStart}
+          onUpload={setLogoUrl}
           existingUrl={logoUrl}
           className="w-full"
         />
@@ -98,10 +77,10 @@ const BrandForm: React.FC<BrandFormProps> = ({ onSuccess, onCancel }) => {
         </button>
         <button
           type="submit"
-          disabled={loading || isUploading}
+          disabled={loading}
           className="px-4 py-2 text-sm font-medium text-white bg-orange-500 rounded-md hover:bg-orange-600 disabled:opacity-50"
         >
-          {loading ? 'Salvando...' : isUploading ? 'Aguarde o upload...' : 'Salvar'}
+          {loading ? 'Salvando...' : 'Salvar'}
         </button>
       </div>
     </form>
