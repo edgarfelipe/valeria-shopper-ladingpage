@@ -27,56 +27,57 @@ const Home = () => {
     fetchData();
   }, []);
 
-  const fetchData = async () => {
-    try {
-      setError(null);
-      
-      // Fetch site settings first
-      const { data: settingsData, error: settingsError } = await supabase
-        .from('site_settings')
-        .select('*')
-        .single();
+const fetchData = async () => {
+  try {
+    setError(null);
+    
+    // Fetch site settings first
+    const { data: settingsData, error: settingsError } = await supabase
+      .from('site_settings')
+      .select('*')
+      .limit(1); // Usa limit(1) para pegar o primeiro registro, caso exista
 
-      if (settingsError) {
-        throw new Error('Erro ao carregar configurações do site');
-      }
-
-      setSettings(settingsData);
-
-      // Fetch other data in parallel
-      const [categoriesRes, brandsRes, featuredRes] = await Promise.all([
-        supabase.from('categories').select('*'),
-        supabase.from('brands').select('*'),
-        supabase.from('products')
-          .select('*, brand:brands(*), category:categories(*)')
-          .eq('is_featured', true)
-          .limit(6)
-      ]);
-
-      if (categoriesRes.error) throw new Error('Erro ao carregar categorias');
-      if (brandsRes.error) throw new Error('Erro ao carregar marcas');
-      if (featuredRes.error) throw new Error('Erro ao carregar produtos em destaque');
-
-      setCategories(categoriesRes.data || []);
-      setBrands(brandsRes.data || []);
-      setFeaturedProducts(featuredRes.data || []);
-
-      // Fetch regular products
-      const { data: productsData, error: productsError } = await supabase
-        .from('products')
-        .select('*, brand:brands(*), category:categories(*)')
-        .limit(6);
-
-      if (productsError) throw new Error('Erro ao carregar produtos');
-      setProducts(productsData || []);
-
-    } catch (error: any) {
-      console.error('Error fetching data:', error);
-      setError(error.message || 'Erro ao carregar dados');
-    } finally {
-      setIsLoading(false);
+    if (settingsError) {
+      throw new Error('Erro ao carregar configurações do site');
     }
-  };
+
+    setSettings(settingsData && settingsData.length > 0 ? settingsData[0] : null);
+
+    // Fetch other data in parallel
+    const [categoriesRes, brandsRes, featuredRes] = await Promise.all([
+      supabase.from('categories').select('*'),
+      supabase.from('brands').select('*'),
+      supabase.from('products')
+        .select('*, brand:brands(*), category:categories(*)')
+        .eq('is_featured', true)
+        .limit(6)
+    ]);
+
+    if (categoriesRes.error) throw new Error('Erro ao carregar categorias');
+    if (brandsRes.error) throw new Error('Erro ao carregar marcas');
+    if (featuredRes.error) throw new Error('Erro ao carregar produtos em destaque');
+
+    setCategories(categoriesRes.data || []);
+    setBrands(brandsRes.data || []);
+    setFeaturedProducts(featuredRes.data || []);
+
+    // Fetch regular products
+    const { data: productsData, error: productsError } = await supabase
+      .from('products')
+      .select('*, brand:brands(*), category:categories(*)')
+      .limit(6);
+
+    if (productsError) throw new Error('Erro ao carregar produtos');
+    setProducts(productsData || []);
+
+  } catch (error: any) {
+    console.error('Error fetching data:', error);
+    setError(error.message || 'Erro ao carregar dados');
+  } finally {
+    setIsLoading(false);
+  }
+};
+
 
   const handleCategoryClick = async (category: Category) => {
     setIsLoading(true);
