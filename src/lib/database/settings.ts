@@ -5,11 +5,11 @@ export const initializeSettings = async (supabase: SupabaseClient) => {
     const { data: existingSettings, error: checkError } = await supabase
       .from('site_settings')
       .select('id')
-      .limit(1); // Verifica se existe ao menos um registro
+      .single();
 
     if (checkError && checkError.code !== 'PGRST116') throw checkError;
 
-    if (!existingSettings || existingSettings.length === 0) {
+    if (!existingSettings) {
       const { error: insertError } = await supabase
         .from('site_settings')
         .insert([{
