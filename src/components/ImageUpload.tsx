@@ -6,6 +6,7 @@ import toast from 'react-hot-toast';
 interface ImageUploadProps {
   type: 'product' | 'brand' | 'category' | 'slide';
   onUpload: (url: string) => void;
+  onUploadStart?: () => void;
   existingUrl?: string;
   className?: string;
 }
@@ -13,6 +14,7 @@ interface ImageUploadProps {
 const ImageUpload: React.FC<ImageUploadProps> = ({
   type,
   onUpload,
+  onUploadStart,
   existingUrl,
   className = ''
 }) => {
@@ -26,6 +28,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
 
     try {
       setIsUploading(true);
+      onUploadStart?.();
       
       // Create preview
       const objectUrl = URL.createObjectURL(file);
@@ -39,7 +42,9 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
       URL.revokeObjectURL(objectUrl);
     } catch (error) {
       console.error('Upload error:', error);
-      toast.error('Error uploading image');
+      toast.error('Erro ao fazer upload da imagem');
+      setPreview('');
+      onUpload('');
     } finally {
       setIsUploading(false);
       if (fileInputRef.current) {
@@ -75,6 +80,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
             className="w-full h-full object-cover rounded-lg"
           />
           <button
+            type="button"
             onClick={clearImage}
             className="absolute top-2 right-2 p-1 bg-white rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
           >
@@ -83,6 +89,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
         </div>
       ) : (
         <button
+          type="button"
           onClick={() => fileInputRef.current?.click()}
           disabled={isUploading}
           className="w-full h-full min-h-[200px] border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center p-6 hover:border-orange-500 transition-colors"
@@ -90,13 +97,13 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
           {isUploading ? (
             <div className="flex flex-col items-center">
               <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-orange-500 mb-2"></div>
-              <span className="text-sm text-gray-500">Uploading...</span>
+              <span className="text-sm text-gray-500">Fazendo upload...</span>
             </div>
           ) : (
             <>
               <Upload className="w-8 h-8 text-gray-400 mb-2" />
-              <span className="text-sm text-gray-500">Click to upload image</span>
-              <span className="text-xs text-gray-400 mt-1">Max size: 5MB</span>
+              <span className="text-sm text-gray-500">Clique para fazer upload da imagem</span>
+              <span className="text-xs text-gray-400 mt-1">Tamanho máximo: 5MB</span>
             </>
           )}
         </button>

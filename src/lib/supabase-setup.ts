@@ -63,12 +63,55 @@ export async function setupDatabase() {
           description3 TEXT NOT NULL,
           created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL
         );
+
+        -- Drop existing policies if they exist
+        DROP POLICY IF EXISTS "Public Access" ON storage.objects;
+        DROP POLICY IF EXISTS "Authenticated Upload" ON storage.objects;
+        DROP POLICY IF EXISTS "Authenticated Delete" ON storage.objects;
+
+        -- Create storage policies
+        CREATE POLICY "Public Access" ON storage.objects 
+          FOR SELECT USING (bucket_id = 'fotos_valeria');
+        
+        CREATE POLICY "Authenticated Upload" ON storage.objects 
+          FOR INSERT WITH CHECK (
+            bucket_id = 'fotos_valeria' 
+            AND (auth.role() = 'authenticated' OR auth.role() = 'anon')
+          );
+        
+        CREATE POLICY "Authenticated Delete" ON storage.objects 
+          FOR DELETE USING (
+            bucket_id = 'fotos_valeria' 
+            AND (auth.role() = 'authenticated' OR auth.role() = 'anon')
+          );
       `
     });
 
     if (setupError) {
       console.error('Error creating tables:', setupError);
       throw setupError;
+    }
+
+    // Create storage bucket
+    try {
+      const { data: buckets } = await supabase.storage.listBuckets();
+      const bucketExists = buckets?.some(bucket => bucket.name === 'fotos_valeria');
+
+      if (!bucketExists) {
+        const { error: bucketError } = await supabase.storage.createBucket('fotos_valeria', {
+          public: true,
+          allowedMimeTypes: ['image/png', 'image/jpeg', 'image/gif', 'image/webp'],
+          fileSizeLimit: 5242880 // 5MB
+        });
+
+        if (bucketError) {
+          console.error('Error creating bucket:', bucketError);
+          throw bucketError;
+        }
+      }
+    } catch (bucketError) {
+      console.error('Error handling storage bucket:', bucketError);
+      // Continue execution even if bucket creation fails
     }
 
     // Check if site settings exist
@@ -105,7 +148,7 @@ export async function setupDatabase() {
       }
     }
 
-    console.log('Database setup completed successfully');
+    console.log('Database and storage setup completed successfully');
   } catch (error) {
     console.error('Error setting up database:', error);
     // Instead of throwing, we'll log the error and continue
